@@ -20,7 +20,22 @@
     <maven.plugin.version>3.3</maven.plugin.version>
     <maven.invoker.plugin.version>1.9</maven.invoker.plugin.version>
     <plexus.utils.version>3.0.9</plexus.utils.version>
+    <rhino.js.version>1.7R2</rhino.js.version>
+    <proxyvole.version>20131209</proxyvole.version>
   </properties>
+
+  <repositories>
+     <repository>
+       <id>bundled-repo</id>
+       <releases>
+           <enabled>true</enabled>
+       </releases>
+       <snapshots>
+           <enabled>false</enabled>
+       </snapshots>
+       <url>file://${project.basedir}/bundled-repo</url>
+     </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -49,6 +64,16 @@
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>rhino</groupId>
+      <artifactId>js</artifactId>
+      <version>${rhino.js.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.btr</groupId>
+      <artifactId>proxy-vole</artifactId>
+      <version>${proxyvole.version}</version>
     </dependency>
   </dependencies>
 
@@ -93,14 +118,14 @@
         <executions>
           <execution>
             <goals>
-              <!-- 
+              <!--
                    Be careful: uncommenting the goal below before having successfully run mvn
-                   install on this plugin project will cause a chicken-and-the-egg problem, 
+                   install on this plugin project will cause a chicken-and-the-egg problem,
                    since the plugin itself will not yet be present in the local repository.
-                   This goal can be temporarily uncommented after building, for testing 
+                   This goal can be temporarily uncommented after building, for testing
                    purposes.
               -->
-              <!-- <goal>detectProxy</goal> -->
+              <goal>detectProxy</goal>
             </goals>
           </execution>
         </executions>
