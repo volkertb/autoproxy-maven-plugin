@@ -42,7 +42,7 @@ import com.btr.proxy.util.Logger;
  * server.
  *
  */
-@Mojo(name = "detectProxy", defaultPhase = LifecyclePhase.VALIDATE)
+@Mojo(name = "detectProxy", defaultPhase = LifecyclePhase.VALIDATE, aggregator = true)
 public class AutoProxyMojo extends AbstractMojo {
 
     private static final String BASIC_HTTP_URL_TO_TRY = "http://www.ams-ix.net";
