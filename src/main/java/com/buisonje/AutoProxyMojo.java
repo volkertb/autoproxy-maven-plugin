@@ -1,3 +1,21 @@
+/*
+ * Copyright 2014 Volkert de Buisonj&eacute;
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * NOTE: proxy-vole has a different license. See the license.txt file bundled
+ *       with the proxy-vole dependency in the bundled-repo folder.
+ */
 package com.buisonje;
 
 /*
@@ -23,8 +41,11 @@ import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -40,12 +61,17 @@ import com.btr.proxy.util.Logger;
 /**
  * Goal which automatically detects and configures the current system proxy
  * server.
+ * 
+ * @author Volkert de Buisonj&eacute;
  *
  */
-@Mojo(name = "detectProxy", defaultPhase = LifecyclePhase.VALIDATE, aggregator = true)
+@Mojo(name = "detectProxy", defaultPhase = LifecyclePhase.VALIDATE, aggregator = false)
 public class AutoProxyMojo extends AbstractMojo {
 
     private static final String BASIC_HTTP_URL_TO_TRY = "http://www.ams-ix.net";
+    private static final String PROXY_DETECTION_TIME_KEY = Date.class.getName();
+    private static final String PROXY_SELECTOR_KEY = ProxySelector.class
+            .getName();
 
     /**
      * The Maven Settings.
@@ -53,22 +79,37 @@ public class AutoProxyMojo extends AbstractMojo {
     @Parameter(defaultValue = "${settings}", readonly = false)
     private Settings settings;
 
+    @Parameter(defaultValue = "${session}", readonly = true)
+    private MavenSession session;
+
+    Map<String, Object> sessionMap = null;
+
     @Override
     public void execute() throws MojoExecutionException {
 
         final Log mojoLog = getLog();
 
-        showMavenProxySettings(mojoLog);
+        ProxySelector myProxySelector = null;
 
-        // showCurrentSystemWideProxiesInfo(mojoLog);
-
-        mojoLog.info("Autodetecting system proxy server(s)...");
-
-        ProxySelector myProxySelector = autodetectProxySettings(mojoLog);
+        if (isProxyDetectionAlreadyAttempted()) {
+            mojoLog.info("Proxy server detection already attempted in this session. Reapplying result(s)...");
+            myProxySelector = (ProxySelector) session.getSystemProperties()
+                    .get(PROXY_SELECTOR_KEY);
+        } else {
+            showMavenProxySettings(mojoLog);
+            // showCurrentSystemWideProxiesInfo(mojoLog);
+            mojoLog.info("Autodetecting system proxy server(s)...");
+            myProxySelector = autodetectProxySettings(mojoLog);
+            session.getSystemProperties().put(PROXY_DETECTION_TIME_KEY,
+                    new Date());
+        }
 
         if (myProxySelector == null) {
-            mojoLog.error("Could not detect proxy server(s) automatically. Falling back to the initial settings...");
+            mojoLog.warn("Could not detect proxy server(s) automatically. Falling back to the initial settings...");
         } else {
+
+            session.getSystemProperties().put(PROXY_SELECTOR_KEY,
+                    myProxySelector);
 
             /*
              * NOTE: It seems that Maven either ignores the system-wide
@@ -83,13 +124,16 @@ public class AutoProxyMojo extends AbstractMojo {
             mojoLog.info("Detected available proxy server(s) for HTTP connections:");
             List<Proxy> detectedAvailableProxies = getAvailableProxies(myProxySelector);
             showAvailableProxies(mojoLog, detectedAvailableProxies);
+            Proxy firstDetectedAvailableProxy = detectedAvailableProxies.get(0);
             mojoLog.info(String
                     .format("Overriding Maven proxy settings with the first detected available proxy (%s)...",
-                            detectedAvailableProxies.get(0).address()
-                                    .toString()));
-            overrideMavenProxySettings(detectedAvailableProxies.get(0), mojoLog);
+                            firstDetectedAvailableProxy.address().toString()));
+            overrideMavenProxySettings(firstDetectedAvailableProxy, mojoLog);
         }
+    }
 
+    private boolean isProxyDetectionAlreadyAttempted() {
+        return session.getSystemProperties().get(PROXY_DETECTION_TIME_KEY) != null;
     }
 
     /**
@@ -124,7 +168,7 @@ public class AutoProxyMojo extends AbstractMojo {
 
             final String nonProxyHosts = mavenProxy.getNonProxyHosts();
             if (nonProxyHosts != null && !nonProxyHosts.isEmpty()) {
-                mojoLog.warn("Non-proxy hosts appear to have been specified in settings.xml. Preserving and respecting those...");
+                mojoLog.info("Non-proxy hosts appear to have been specified in settings.xml. Leaving those untouched.");
             }
 
             mavenProxy.setActive(true);
