@@ -4,7 +4,7 @@
 
   <groupId>com.buisonje</groupId>
   <artifactId>autoproxy-maven-plugin</artifactId>
-  <version>1.0-alpha-01</version>
+  <version>1.0-alpha-02</version>
   <packaging>maven-plugin</packaging>
 
   <name>Autoproxy Maven Plugin</name>

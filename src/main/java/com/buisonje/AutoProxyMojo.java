@@ -148,6 +148,14 @@ public class AutoProxyMojo extends AbstractMojo {
 
         org.apache.maven.settings.Proxy mavenProxy = settings.getActiveProxy();
 
+        if (mavenProxy == null) {
+            /*
+             * Create a new Maven proxy setting instance that will end up
+             * containing the detected overriding proxy server configuration.
+             */
+            mavenProxy = new org.apache.maven.settings.Proxy();
+        }
+
         if (mavenProxy.getSourceLevel() == null) {
             /*
              * User level should be enough for overriding the proxy for the
