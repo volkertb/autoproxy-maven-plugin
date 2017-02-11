@@ -55,8 +55,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 
-import com.btr.proxy.search.ProxySearch;
-import com.btr.proxy.util.Logger;
+import com.github.markusbernhardt.proxy.ProxySearch;
+import com.github.markusbernhardt.proxy.util.Logger;
 
 /**
  * Goal which automatically detects and configures the current system proxy

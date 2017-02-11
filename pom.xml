@@ -4,7 +4,7 @@
 
   <groupId>com.buisonje</groupId>
   <artifactId>autoproxy-maven-plugin</artifactId>
-  <version>1.0-alpha-02</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Autoproxy Maven Plugin</name>
@@ -21,21 +21,8 @@
     <maven.invoker.plugin.version>1.9</maven.invoker.plugin.version>
     <plexus.utils.version>3.0.9</plexus.utils.version>
     <rhino.js.version>1.7R2</rhino.js.version>
-    <proxyvole.version>20131209</proxyvole.version>
+    <proxyvole.version>1.0.3</proxyvole.version>
   </properties>
-
-  <repositories>
-     <repository>
-       <id>bundled-repo</id>
-       <releases>
-           <enabled>true</enabled>
-       </releases>
-       <snapshots>
-           <enabled>false</enabled>
-       </snapshots>
-       <url>file://${project.basedir}/bundled-repo</url>
-     </repository>
-  </repositories>
 
   <dependencies>
     <dependency>
@@ -76,7 +63,7 @@
       <version>${rhino.js.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.btr</groupId>
+      <groupId>com.github.markusbernhardt</groupId>
       <artifactId>proxy-vole</artifactId>
       <version>${proxyvole.version}</version>
     </dependency>

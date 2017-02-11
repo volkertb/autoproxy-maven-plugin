@@ -22,8 +22,8 @@ import java.text.MessageFormat;
 
 import org.apache.maven.plugin.logging.Log;
 
-import com.btr.proxy.util.Logger.LogBackEnd;
-import com.btr.proxy.util.Logger.LogLevel;
+import com.github.markusbernhardt.proxy.util.Logger.LogBackEnd;
+import com.github.markusbernhardt.proxy.util.Logger.LogLevel;
 
 /**
  * Allows proxy-vole to log to Maven's Mojo logging mechanism.
